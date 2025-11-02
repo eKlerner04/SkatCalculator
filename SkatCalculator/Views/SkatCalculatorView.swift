@@ -13,15 +13,19 @@ struct SkatCalculatorView: View{
     
     @State private var Grand = false
     @State private var Nullspiel = false
-    @State private var Reizwert = 0
-    //@State private var mit = 0
-    @State private var ohne = 0
+    @State private var SäsischeSpitze = false
+    
+    
+    
+    
     
     var body: some View{
         NavigationStack{
             VStack {
                 
-                Text("Reizwert ist: \(Reizwert)")
+                
+        
+                
                 var mit: Int {
                     if hasCrossJack && hasPikJack && hasHeartJack && hasDiamondJack { return 4 }
                     else if hasCrossJack && hasPikJack && hasHeartJack { return 3 }
@@ -31,18 +35,66 @@ struct SkatCalculatorView: View{
                 }
                 
                 var ohne: Int {
-                    if hasPikJack && !hasCrossJack { return  1}
-                    else if !hasPikJack && !hasCrossJack && hasHeartJack { return 2}
-                    else if !hasPikJack && !hasCrossJack && !hasHeartJack && hasDiamondJack {return 3}
-                    else if !hasPikJack && !hasCrossJack && !hasHeartJack && !hasDiamondJack {return 4}
-                    else { return 0}
+                    if !hasCrossJack && !hasPikJack && !hasHeartJack && !hasDiamondJack { return 4 }
+                    else if !hasCrossJack && !hasPikJack && !hasHeartJack { return 3 }
+                    else if !hasCrossJack && !hasPikJack { return 2 }
+                    else if !hasCrossJack { return 1 }
+                    else { return 0 }
                 }
+
 
                 var spielwert: Int {
                     if (mit+1) > (ohne+1){
                         return mit+1
                     } else{
                         return ohne+1
+                    }
+                }
+                
+                
+                var mitSäsischeSpitze: Int {
+                    if hasDiamondJack && hasHeartJack && hasPikJack && hasCrossJack {
+                        return 4
+                    } else if hasDiamondJack && hasHeartJack && hasPikJack {
+                        return 3
+                    } else if hasDiamondJack && hasHeartJack {
+                        return 2
+                    } else if hasDiamondJack {
+                        return 1
+                    } else {
+                        return 0
+                    }
+                }
+                
+                var ohneSäsischeSpitze: Int{
+                    if !hasDiamondJack && !hasHeartJack && !hasPikJack && !hasCrossJack {
+                        return 4
+                    } else if !hasDiamondJack && !hasHeartJack && !hasPikJack{
+                        return 3
+                    } else if !hasDiamondJack && !hasHeartJack {
+                        return 2
+                    } else if !hasDiamondJack {
+                        return 1
+                    } else {
+                        return 0
+                    }
+                }
+                
+                var spielwertSäsischeSpitze: Int {
+                    if (mitSäsischeSpitze+1) > (ohneSäsischeSpitze+1) {
+                        return mitSäsischeSpitze+1
+                    } else {
+                        return ohneSäsischeSpitze+1
+                    }
+                }
+
+                
+                
+                var mitOrOhneSäsischeSpitze: String {
+                    if mit > ohne {
+                        return "Mit"
+                    } else {
+                        return "Ohne"
                     }
                 }
                 
@@ -54,7 +106,48 @@ struct SkatCalculatorView: View{
                     }
                 }
                 
-                Text("\(mitOrOhne) \(mit) Spiel \(spielwert)")
+                var Reizwert: Int {
+                    let wert = SäsischeSpitze ? spielwertSäsischeSpitze : spielwert
+                    
+                    if Nullspiel { return 23 }
+                    if SäsischeSpitze { return spielwertSäsischeSpitze * 20 }
+                    if Grand { return spielwert * 24 }
+
+                    if FarbspielClub { return spielwert * 12 }
+                    if FarbspielSpade { return spielwert * 11 }
+                    if FarbspielHeart { return spielwert * 10 }
+                    if FarbspielDiamond { return spielwert * 9 }
+                    return 0
+                }
+
+                
+                var aktMit: Int {
+                    SäsischeSpitze ? mitSäsischeSpitze : mit
+                }
+
+                var aktOhne: Int {
+                    SäsischeSpitze ? ohneSäsischeSpitze : ohne
+                }
+
+                var aktMitOderOhne: String {
+                    aktMit > aktOhne ? "Mit" : "Ohne"
+                }
+
+                var aktSpielwert: Int {
+                    max(aktMit, aktOhne) + 1
+                }
+                
+                
+                
+                Text("Reizwert ist: \(Reizwert)")
+
+                if Nullspiel {
+                    Text("Nullspiel")
+                } else {
+                    Text("\(aktMitOderOhne) \(aktMitOderOhne == "Mit" ? aktMit : aktOhne) Spiel \(aktSpielwert)")
+                }
+
+
                 
                 HStack{
                     if hasCrossJack{
@@ -88,6 +181,7 @@ struct SkatCalculatorView: View{
                 Button{
                     Grand = false
                     Nullspiel = false
+                    SäsischeSpitze = false
                     
                     if Farbspiel{
                         Farbspiel = false
@@ -194,6 +288,7 @@ struct SkatCalculatorView: View{
                 Button{
                     Farbspiel = false
                     Nullspiel = false
+                    SäsischeSpitze = false
                     if Grand {
                         Grand = false
                     } else {
@@ -217,6 +312,7 @@ struct SkatCalculatorView: View{
                 Button {
                     Farbspiel = false
                     Grand = false
+                    SäsischeSpitze = false
                     if Nullspiel{
                         Nullspiel = false
                     } else{
@@ -235,7 +331,30 @@ struct SkatCalculatorView: View{
                             .padding(6)
                     }
                 }
-        
+                
+                Button {
+                    Farbspiel = false
+                    Grand = false
+                    Nullspiel = false
+                    
+                    if SäsischeSpitze{
+                        SäsischeSpitze = false
+                    } else {
+                        SäsischeSpitze = true
+                    }
+                } label: {
+                    if SäsischeSpitze{
+                        Text("Säsische Spitze")
+                            .padding(6)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2))
+                    } else {
+                        Text("Säsische Spitze")
+                            .padding(6)
+                    }
+                }
+                
+                
+                    
             }
             .navigationTitle("Reiz Calculator")
         }

@@ -20,6 +20,7 @@ struct ContentView: View {
                     } label: {
                         if hasCrossJack{
                             Image(systemName: "suit.club.fill")
+                                .foregroundStyle(.black)
                                 .padding(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
@@ -27,6 +28,7 @@ struct ContentView: View {
                                 )
                         } else {
                             Image(systemName: "suit.club.fill")
+                                .foregroundStyle(.black)
                                 .padding(6)
                         }
                     }
@@ -40,6 +42,8 @@ struct ContentView: View {
                     } label: {
                         if hasPikJack{
                             Image(systemName: "suit.spade.fill")
+                                .foregroundStyle(.black)
+
                                 .padding(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
@@ -47,6 +51,8 @@ struct ContentView: View {
                                 )
                         } else {
                             Image(systemName: "suit.spade.fill")
+                                .foregroundStyle(.black)
+
                                 .padding(6)
                         }
                     }
@@ -60,6 +66,8 @@ struct ContentView: View {
                     } label: {
                         if hasHeartJack{
                             Image(systemName: "suit.heart.fill")
+                                .foregroundStyle(.red)
+
                                 .padding(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
@@ -67,6 +75,7 @@ struct ContentView: View {
                                 )
                         } else {
                             Image(systemName: "suit.heart.fill")
+                                .foregroundStyle(.red)
                                 .padding(6)
                         }
                     }
@@ -80,6 +89,7 @@ struct ContentView: View {
                     } label: {
                         if hasDimondJack{
                             Image(systemName: "suit.diamond.fill")
+                                .foregroundStyle(.red)
                                 .padding(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
@@ -87,6 +97,7 @@ struct ContentView: View {
                                 )
                         } else {
                             Image(systemName: "suit.diamond.fill")
+                                .foregroundStyle(.red)
                                 .padding(6)
                         }
                     }
