@@ -1,0 +1,250 @@
+import SwiftUI
+
+struct SkatCalculatorView: View{
+    let hasCrossJack: Bool
+    let hasPikJack: Bool
+    let hasHeartJack: Bool
+    let hasDiamondJack: Bool
+    @State private var Farbspiel = false
+    @State private var FarbspielClub = false
+    @State private var FarbspielSpade = false
+    @State private var FarbspielHeart = false
+    @State private var FarbspielDiamond = false
+    
+    @State private var Grand = false
+    @State private var Nullspiel = false
+    @State private var Reizwert = 0
+    //@State private var mit = 0
+    @State private var ohne = 0
+    
+    var body: some View{
+        NavigationStack{
+            VStack {
+                
+                Text("Reizwert ist: \(Reizwert)")
+                var mit: Int {
+                    if hasCrossJack && hasPikJack && hasHeartJack && hasDiamondJack { return 4 }
+                    else if hasCrossJack && hasPikJack && hasHeartJack { return 3 }
+                    else if hasCrossJack && hasPikJack { return 2 }
+                    else if hasCrossJack { return 1 }
+                    else { return 0 }
+                }
+                
+                var ohne: Int {
+                    if hasPikJack && !hasCrossJack { return  1}
+                    else if !hasPikJack && !hasCrossJack && hasHeartJack { return 2}
+                    else if !hasPikJack && !hasCrossJack && !hasHeartJack && hasDiamondJack {return 3}
+                    else if !hasPikJack && !hasCrossJack && !hasHeartJack && !hasDiamondJack {return 4}
+                    else { return 0}
+                }
+
+                var spielwert: Int {
+                    if (mit+1) > (ohne+1){
+                        return mit+1
+                    } else{
+                        return ohne+1
+                    }
+                }
+                
+                var mitOrOhne: String {
+                    if mit > ohne{
+                        return "Mit"
+                    } else {
+                        return "Ohne"
+                    }
+                }
+                
+                Text("\(mitOrOhne) \(mit) Spiel \(spielwert)")
+                
+                HStack{
+                    if hasCrossJack{
+                        Image(systemName: "suit.club.fill")
+                    }else {
+                        Text("/")
+                    }
+                    
+                    if hasPikJack{
+                        Image(systemName: "suit.spade.fill")
+                    } else {
+                        Text("/")
+                    }
+                    
+                    if hasHeartJack {
+                        Image(systemName: "suit.heart.fill")
+                            .foregroundColor(.red)
+                    } else {
+                        Text("/")
+                    }
+                    if hasDiamondJack {
+                        Image(systemName: "suit.diamond.fill")
+                            .foregroundColor(.red)
+                    } else {
+                        Text("/")
+                    }
+                }
+                
+                
+                
+                Button{
+                    Grand = false
+                    Nullspiel = false
+                    
+                    if Farbspiel{
+                        Farbspiel = false
+                    } else {
+                        Farbspiel = true
+                    }
+                }label: {
+                    Text("Farbspiel")
+                        .padding(6)
+                }
+                
+                if Farbspiel{
+                    HStack{
+                        Button{
+                            FarbspielClub = true
+                            FarbspielSpade = false
+                            FarbspielDiamond = false
+                            FarbspielHeart = false
+                        } label:{
+                            if FarbspielClub{
+                                Image(systemName: "suit.club.fill")
+                                    .foregroundStyle(.black)
+                                    .padding(6)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.green, lineWidth: 2)
+                                    )
+                            } else {
+                                Image(systemName: "suit.club.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.black)
+                            }
+                        }
+                        
+                        Button{
+                            FarbspielSpade = true
+                            FarbspielClub = false
+                            FarbspielDiamond = false
+                            FarbspielHeart = false
+                        } label:{
+                            if FarbspielSpade {
+                                Image(systemName: "suit.spade.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.black)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.green, lineWidth: 2)
+                                    )
+                            } else {
+                                Image(systemName: "suit.spade.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.black)
+                            }
+                        }
+                        
+                        Button{
+                            FarbspielHeart = true
+                            FarbspielClub = false
+                            FarbspielSpade = false
+                            FarbspielDiamond = false
+                            
+                        } label:{
+                            if FarbspielHeart {
+                                Image(systemName: "suit.heart.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.red)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.green, lineWidth: 2)
+                                    )
+                            } else {
+                                Image(systemName: "suit.heart.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        
+                        
+                        Button{
+                            FarbspielDiamond = true
+                            FarbspielClub = false
+                            FarbspielSpade = false
+                            FarbspielHeart = false
+                            
+                        } label:{
+                            if FarbspielDiamond {
+                                Image(systemName: "suit.diamond.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.red)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.green, lineWidth: 2)
+                                    )
+                            } else {
+                                Image(systemName: "suit.diamond.fill")
+                                    .padding(6)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        
+                    }
+                }
+                
+                Button{
+                    Farbspiel = false
+                    Nullspiel = false
+                    if Grand {
+                        Grand = false
+                    } else {
+                        Grand = true
+                    }
+                } label:{
+                    if Grand {
+                        Text("Grand")
+                            .padding(6)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.green, lineWidth: 2)
+                            )
+                    } else{
+                        Text("Grand")
+                            .padding(6)
+                    }
+                }
+                
+                
+                Button {
+                    Farbspiel = false
+                    Grand = false
+                    if Nullspiel{
+                        Nullspiel = false
+                    } else{
+                        Nullspiel = true
+                    }
+                } label:{
+                    if Nullspiel{
+                        Text("Nullspiel")
+                            .padding(6)
+                            .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.green, lineWidth: 2)
+                            )
+                    } else{
+                        Text("Nullspiel")
+                            .padding(6)
+                    }
+                }
+        
+            }
+            .navigationTitle("Reiz Calculator")
+        }
+    }
+}
+
+#Preview {
+    SkatCalculatorView(hasCrossJack: true, hasPikJack: true, hasHeartJack: false, hasDiamondJack: true)
+}
+
+
+
