@@ -1,10 +1,11 @@
 import SwiftUI
 
-struct SkatCalculatorView: View{
+struct SkatCalculatorView: View {
     let hasCrossJack: Bool
     let hasPikJack: Bool
     let hasHeartJack: Bool
     let hasDiamondJack: Bool
+    
     @State private var Farbspiel = false
     @State private var FarbspielClub = false
     @State private var FarbspielSpade = false
@@ -15,16 +16,16 @@ struct SkatCalculatorView: View{
     @State private var Nullspiel = false
     @State private var SäsischeSpitze = false
     
+    @State private var hand = false
+    @State private var ouvert = false
+    @State private var schneider = false
+    @State private var schneiderAngesagt = false
+    @State private var schwarz = false
+    @State private var schwarzAngesagt = false
     
-    
-    
-    
-    var body: some View{
-        NavigationStack{
-            VStack {
-                
-                
-        
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 10) {
                 
                 var mit: Int {
                     if hasCrossJack && hasPikJack && hasHeartJack && hasDiamondJack { return 4 }
@@ -41,322 +42,199 @@ struct SkatCalculatorView: View{
                     else if !hasCrossJack { return 1 }
                     else { return 0 }
                 }
-
-
+                
                 var spielwert: Int {
-                    if (mit+1) > (ohne+1){
-                        return mit+1
-                    } else{
-                        return ohne+1
-                    }
+                    max(mit, ohne) + 1
                 }
                 
-                
-                var mitSäsischeSpitze: Int {
-                    if hasDiamondJack && hasHeartJack && hasPikJack && hasCrossJack {
-                        return 4
-                    } else if hasDiamondJack && hasHeartJack && hasPikJack {
-                        return 3
-                    } else if hasDiamondJack && hasHeartJack {
-                        return 2
-                    } else if hasDiamondJack {
-                        return 1
-                    } else {
-                        return 0
-                    }
+                var mitS: Int {
+                    if hasDiamondJack && hasHeartJack && hasPikJack && hasCrossJack { return 4 }
+                    else if hasDiamondJack && hasHeartJack && hasPikJack { return 3 }
+                    else if hasDiamondJack && hasHeartJack { return 2 }
+                    else if hasDiamondJack { return 1 }
+                    else { return 0 }
                 }
                 
-                var ohneSäsischeSpitze: Int{
-                    if !hasDiamondJack && !hasHeartJack && !hasPikJack && !hasCrossJack {
-                        return 4
-                    } else if !hasDiamondJack && !hasHeartJack && !hasPikJack{
-                        return 3
-                    } else if !hasDiamondJack && !hasHeartJack {
-                        return 2
-                    } else if !hasDiamondJack {
-                        return 1
-                    } else {
-                        return 0
-                    }
+                var ohneS: Int {
+                    if !hasDiamondJack && !hasHeartJack && !hasPikJack && !hasCrossJack { return 4 }
+                    else if !hasDiamondJack && !hasHeartJack && !hasPikJack { return 3 }
+                    else if !hasDiamondJack && !hasHeartJack { return 2 }
+                    else if !hasDiamondJack { return 1 }
+                    else { return 0 }
                 }
                 
-                var spielwertSäsischeSpitze: Int {
-                    if (mitSäsischeSpitze+1) > (ohneSäsischeSpitze+1) {
-                        return mitSäsischeSpitze+1
-                    } else {
-                        return ohneSäsischeSpitze+1
-                    }
-                }
-
-                
-                
-                var mitOrOhneSäsischeSpitze: String {
-                    if mit > ohne {
-                        return "Mit"
-                    } else {
-                        return "Ohne"
-                    }
+                var spielwertS: Int {
+                    max(mitS, ohneS) + 1
                 }
                 
-                var mitOrOhne: String {
-                    if mit > ohne{
-                        return "Mit"
-                    } else {
-                        return "Ohne"
-                    }
+                var multiplikatorZusatz: Int {
+                    var m = 0
+                    if hand { m += 1 }
+                    
+                    if schwarzAngesagt { m += 3 }
+                    else if schwarz { m += 2 }
+                    else if schneiderAngesagt { m += 2 }
+                    else if schneider { m += 1 }
+                    
+                    if ouvert && !Nullspiel { m += 1 }
+                    return m
+                }
+                
+                var effektiverSpielwert: Int {
+                    let basis = SäsischeSpitze ? spielwertS : spielwert
+                    return basis + multiplikatorZusatz
                 }
                 
                 var Reizwert: Int {
-                    let wert = SäsischeSpitze ? spielwertSäsischeSpitze : spielwert
+                    if Nullspiel {
+                        if ouvert { return 59 }
+                        if hand { return 35 }
+                        return 23
+                    }
                     
-                    if Nullspiel { return 23 }
-                    if SäsischeSpitze { return spielwertSäsischeSpitze * 20 }
-                    if Grand { return spielwert * 24 }
-
-                    if FarbspielClub { return spielwert * 12 }
-                    if FarbspielSpade { return spielwert * 11 }
-                    if FarbspielHeart { return spielwert * 10 }
-                    if FarbspielDiamond { return spielwert * 9 }
+                    if SäsischeSpitze { return effektiverSpielwert * 20 }
+                    if Grand { return effektiverSpielwert * 24 }
+                    if FarbspielClub { return effektiverSpielwert * 12 }
+                    if FarbspielSpade { return effektiverSpielwert * 11 }
+                    if FarbspielHeart { return effektiverSpielwert * 10 }
+                    if FarbspielDiamond { return effektiverSpielwert * 9 }
+                    
                     return 0
                 }
-
                 
-                var aktMit: Int {
-                    SäsischeSpitze ? mitSäsischeSpitze : mit
-                }
-
-                var aktOhne: Int {
-                    SäsischeSpitze ? ohneSäsischeSpitze : ohne
-                }
-
-                var aktMitOderOhne: String {
-                    aktMit > aktOhne ? "Mit" : "Ohne"
-                }
-
-                var aktSpielwert: Int {
-                    max(aktMit, aktOhne) + 1
-                }
+                let aktMit = SäsischeSpitze ? mitS : mit
+                let aktOhne = SäsischeSpitze ? ohneS : ohne
+                let aktText = aktMit > aktOhne ? "Mit \(aktMit)" : "Ohne \(aktOhne)"
                 
+                Text("Reizwert: \(Reizwert)")
+                    .font(.title2).bold()
                 
-                
-                Text("Reizwert ist: \(Reizwert)")
-
                 if Nullspiel {
                     Text("Nullspiel")
                 } else {
-                    Text("\(aktMitOderOhne) \(aktMitOderOhne == "Mit" ? aktMit : aktOhne) Spiel \(aktSpielwert)")
+                    Text("\(aktText) • Spiel \(effektiverSpielwert)")
                 }
-
-
                 
-                HStack{
+                HStack {
                     if hasCrossJack{
                         Image(systemName: "suit.club.fill")
-                    }else {
+                    } else {
                         Text("/")
                     }
-                    
-                    if hasPikJack{
+                    if hasPikJack {
                         Image(systemName: "suit.spade.fill")
                     } else {
                         Text("/")
                     }
                     
-                    if hasHeartJack {
-                        Image(systemName: "suit.heart.fill")
-                            .foregroundColor(.red)
+                    if hasHeartJack{
+                        Image(systemName: "suit.heart.fill").foregroundColor(.red)
                     } else {
                         Text("/")
                     }
-                    if hasDiamondJack {
-                        Image(systemName: "suit.diamond.fill")
-                            .foregroundColor(.red)
-                    } else {
+                    
+                    if hasDiamondJack{
+                        Image(systemName: "suit.diamond.fill").foregroundColor(.red)
+                    }else {
                         Text("/")
                     }
                 }
+                .font(.title)
                 
-                
-                
-                Button{
-                    Grand = false
-                    Nullspiel = false
-                    SäsischeSpitze = false
+                Group {
+                    Button { switchGame(.farbspiel) } label: { textButton("Farbspiel", active: Farbspiel) }
+                    if Farbspiel {
+                        HStack {
+                            suitButton("suit.club.fill", active: $FarbspielClub)
+                            suitButton("suit.spade.fill", active: $FarbspielSpade)
+                            suitButton("suit.heart.fill", active: $FarbspielHeart, color: .red)
+                            suitButton("suit.diamond.fill", active: $FarbspielDiamond, color: .red)
+                        }
+                    }
                     
-                    if Farbspiel{
-                        Farbspiel = false
-                    } else {
-                        Farbspiel = true
-                    }
-                }label: {
-                    Text("Farbspiel")
-                        .padding(6)
+                    Button {
+                        switchGame(.grand)
+                    } label: { textButton("Grand", active: Grand) }
+                    Button {
+                        switchGame(.nullspiel) } label:  { textButton("Nullspiel", active: Nullspiel) }
+                    Button { switchGame(.saechsisch) } label: { textButton("Sächsische Spitze", active: SäsischeSpitze) }
                 }
                 
-                if Farbspiel{
-                    HStack{
-                        Button{
-                            FarbspielClub = true
-                            FarbspielSpade = false
-                            FarbspielDiamond = false
-                            FarbspielHeart = false
-                        } label:{
-                            if FarbspielClub{
-                                Image(systemName: "suit.club.fill")
-                                    .foregroundStyle(.black)
-                                    .padding(6)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.green, lineWidth: 2)
-                                    )
-                            } else {
-                                Image(systemName: "suit.club.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.black)
-                            }
+                // MARK: Zusatzansagen
+                VStack {
+                    HStack {
+                        toggleButton("Hand", flag: $hand, after: { if ouvert { hand = true } })
+                        toggleButton("Ouvert", flag: $ouvert, after: { if ouvert { hand = true } })
+                    }
+                    HStack {
+                        toggleButton("Schneider", flag: $schneider) {
+                            schneiderAngesagt = false; schwarz = false; schwarzAngesagt = false
                         }
-                        
-                        Button{
-                            FarbspielSpade = true
-                            FarbspielClub = false
-                            FarbspielDiamond = false
-                            FarbspielHeart = false
-                        } label:{
-                            if FarbspielSpade {
-                                Image(systemName: "suit.spade.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.black)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.green, lineWidth: 2)
-                                    )
-                            } else {
-                                Image(systemName: "suit.spade.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.black)
-                            }
+                        toggleButton("Schneider anges.", flag: $schneiderAngesagt) {
+                            schneider = false; schwarz = false; schwarzAngesagt = false
                         }
-                        
-                        Button{
-                            FarbspielHeart = true
-                            FarbspielClub = false
-                            FarbspielSpade = false
-                            FarbspielDiamond = false
-                            
-                        } label:{
-                            if FarbspielHeart {
-                                Image(systemName: "suit.heart.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.red)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.green, lineWidth: 2)
-                                    )
-                            } else {
-                                Image(systemName: "suit.heart.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.red)
-                            }
+                    }
+                    HStack {
+                        toggleButton("Schwarz", flag: $schwarz) {
+                            schneider = false; schneiderAngesagt = false; schwarzAngesagt = false
                         }
-                        
-                        
-                        Button{
-                            FarbspielDiamond = true
-                            FarbspielClub = false
-                            FarbspielSpade = false
-                            FarbspielHeart = false
-                            
-                        } label:{
-                            if FarbspielDiamond {
-                                Image(systemName: "suit.diamond.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.red)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.green, lineWidth: 2)
-                                    )
-                            } else {
-                                Image(systemName: "suit.diamond.fill")
-                                    .padding(6)
-                                    .foregroundStyle(.red)
-                            }
+                        toggleButton("Schwarz anges.", flag: $schwarzAngesagt) {
+                            schwarz = false; schneider = false; schneiderAngesagt = false
                         }
-                        
                     }
                 }
                 
-                Button{
-                    Farbspiel = false
-                    Nullspiel = false
-                    SäsischeSpitze = false
-                    if Grand {
-                        Grand = false
-                    } else {
-                        Grand = true
-                    }
-                } label:{
-                    if Grand {
-                        Text("Grand")
-                            .padding(6)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.green, lineWidth: 2)
-                            )
-                    } else{
-                        Text("Grand")
-                            .padding(6)
-                    }
-                }
-                
-                
-                Button {
-                    Farbspiel = false
-                    Grand = false
-                    SäsischeSpitze = false
-                    if Nullspiel{
-                        Nullspiel = false
-                    } else{
-                        Nullspiel = true
-                    }
-                } label:{
-                    if Nullspiel{
-                        Text("Nullspiel")
-                            .padding(6)
-                            .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.green, lineWidth: 2)
-                            )
-                    } else{
-                        Text("Nullspiel")
-                            .padding(6)
-                    }
-                }
-                
-                Button {
-                    Farbspiel = false
-                    Grand = false
-                    Nullspiel = false
-                    
-                    if SäsischeSpitze{
-                        SäsischeSpitze = false
-                    } else {
-                        SäsischeSpitze = true
-                    }
-                } label: {
-                    if SäsischeSpitze{
-                        Text("Säsische Spitze")
-                            .padding(6)
-                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 2))
-                    } else {
-                        Text("Säsische Spitze")
-                            .padding(6)
-                    }
-                }
-                
-                
-                    
             }
             .navigationTitle("Reiz Calculator")
+            .padding()
+        }
+    }
+    
+    
+    func textButton(_ label: String, active: Bool) -> some View {
+        Text(label)
+            .padding(6)
+            .overlay(active ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
+    }
+    
+    func suitButton(_ icon: String, active: Binding<Bool>, color: Color = .black) -> some View {
+        Button {
+            FarbspielClub = false; FarbspielSpade = false; FarbspielHeart = false; FarbspielDiamond = false
+            active.wrappedValue = true
+        } label: {
+            Image(systemName: icon)
+                .padding(6)
+                .foregroundStyle(color)
+                .overlay(active.wrappedValue ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
+        }
+    }
+    
+    enum GameOption { case farbspiel, grand, nullspiel, saechsisch }
+    
+    func switchGame(_ option: GameOption) {
+        // Reset alles
+        Farbspiel = false; FarbspielClub = false; FarbspielSpade = false
+        FarbspielHeart = false; FarbspielDiamond = false
+        Grand = false; Nullspiel = false; SäsischeSpitze = false
+        
+        switch option {
+        case .farbspiel: Farbspiel = true
+        case .grand: Grand = true
+        case .nullspiel: Nullspiel = true
+        case .saechsisch: SäsischeSpitze = true
+        }
+        
+        if option == .nullspiel { schneider = false; schneiderAngesagt = false; schwarz = false; schwarzAngesagt = false }
+    }
+    
+    func toggleButton(_ name: String, flag: Binding<Bool>, after: (() -> Void)? = nil) -> some View {
+        Button {
+            flag.wrappedValue.toggle()
+            after?()
+        } label: {
+            Text(name)
+                .padding(6)
+                .overlay(flag.wrappedValue ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
         }
     }
 }
@@ -364,6 +242,3 @@ struct SkatCalculatorView: View{
 #Preview {
     SkatCalculatorView(hasCrossJack: true, hasPikJack: true, hasHeartJack: false, hasDiamondJack: true)
 }
-
-
-
