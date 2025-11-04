@@ -1,0 +1,61 @@
+/* ContentView */
+"choose_your_jacks" = "Choose Your Jacks";
+"tap_cards" = "Tap the cards you have";
+"selected" = "Selected";
+"jack" = "Jack";
+"jacks" = "Jacks";
+"jack_letter" = "J";
+"calculate_reizwert" = "Calculate Bid Value";
+
+/* Card Names */
+"kreuz" = "Clubs";
+"pik" = "Spades";
+"herz" = "Hearts";
+"karo" = "Diamonds";
+
+/* SkatCalculatorView */
+"reizwert" = "Bid Value";
+"mit" = "With";
+"ohne" = "Without";
+"spiel" = "Game";
+
+/* Game Types */
+"farbspiel" = "Suit Game";
+"grand" = "Grand";
+"nullspiel" = "Null Game";
+"saechsische_spitze" = "Saxon Peak";
+"spielart" = "Game Type";
+
+/* Additional Options */
+"zusatzansagen" = "Additional Bids";
+"hand" = "Hand";
+"ouvert" = "Open";
+"schneider" = "Schneider";
+"schneider_angesagt" = "Schneider Announced";
+"schwarz" = "Schwarz";
+"schwarz_angesagt" = "Schwarz Announced";
+
+/* Settings */
+"settings" = "Settings";
+"language" = "Language";
+"select_language" = "Select Your Language";
+"about" = "About";
+"app_version" = "Version";
+"app_description" = "SkatCalculator helps you calculate the correct bid value in the Skat card game. Select your jacks, game type, and additional bids.";
+"privacy_policy" = "Privacy Policy";
+
+/* Privacy Policy */
+"last_updated" = "Last Updated: November 2025";
+"privacy_intro_title" = "Introduction";
+"privacy_intro_text" = "We take the protection of your personal data very seriously. This privacy policy informs you about how SkatCalculator handles your data.";
+"data_collection_title" = "Data Collection";
+"data_collection_text" = "SkatCalculator does not collect any personal data. The app works completely offline and does not send any information to external servers. All calculations are performed locally on your device.";
+"data_usage_title" = "Data Usage";
+"data_usage_text" = "The only data stored are your app settings (e.g., language selection). This information is stored exclusively locally in your device's UserDefaults and is never shared.";
+"data_storage_title" = "Data Storage";
+"data_storage_text" = "All data is stored exclusively on your device. There is no synchronization with cloud services unless you use your device's standard iCloud backup function.";
+"user_rights_title" = "Your Rights";
+"user_rights_text" = "You can delete all locally stored data at any time by uninstalling the app. Since no personal data is collected, there is no additional data you need to access or delete.";
+"changes_title" = "Changes";
+"changes_text" = "We reserve the right to update this privacy policy. Changes will be announced in the app and take effect upon the release of a new app version.";
+

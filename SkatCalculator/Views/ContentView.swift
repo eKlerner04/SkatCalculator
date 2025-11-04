@@ -5,8 +5,8 @@ struct ContentView: View {
     @State private var hasPikJack = false
     @State private var hasHeartJack = false
     @State private var hasDimondJack = false
+    @ObservedObject var languageManager = LanguageManager.shared
     
-    // Farbschema: Poker-Tisch-Theme
     private let pokerGreen = Color(red: 0.09, green: 0.35, blue: 0.25)
     private let darkGreen = Color(red: 0.05, green: 0.25, blue: 0.18)
     private let goldAccent = Color(red: 0.85, green: 0.65, blue: 0.13)
@@ -30,11 +30,11 @@ struct ContentView: View {
                             .font(.system(size: 40))
                             .foregroundColor(goldAccent)
                         
-                        Text("Wähle deine Buben")
+                        Text(LocalizedStrings.chooseYourJacks.localized(languageManager.currentLanguage))
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundColor(cardWhite)
                         
-                        Text("Tippe auf die Karten, die du hast")
+                        Text(LocalizedStrings.tapCards.localized(languageManager.currentLanguage))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(cardWhite.opacity(0.7))
                     }
@@ -44,7 +44,7 @@ struct ContentView: View {
                         HStack(spacing: 16) {
                             JackCardView(
                                 suit: "suit.club.fill",
-                                suitName: "Kreuz",
+                                suitName: LocalizedStrings.kreuz.localized(languageManager.currentLanguage),
                                 color: .black,
                                 isSelected: hasCrossJack
                             ) {
@@ -55,7 +55,7 @@ struct ContentView: View {
                             
                             JackCardView(
                                 suit: "suit.spade.fill",
-                                suitName: "Pik",
+                                suitName: LocalizedStrings.pik.localized(languageManager.currentLanguage),
                                 color: .black,
                                 isSelected: hasPikJack
                             ) {
@@ -68,7 +68,7 @@ struct ContentView: View {
                         HStack(spacing: 16) {
                             JackCardView(
                                 suit: "suit.heart.fill",
-                                suitName: "Herz",
+                                suitName: LocalizedStrings.herz.localized(languageManager.currentLanguage),
                                 color: .red,
                                 isSelected: hasHeartJack
                             ) {
@@ -79,7 +79,7 @@ struct ContentView: View {
                             
                             JackCardView(
                                 suit: "suit.diamond.fill",
-                                suitName: "Karo",
+                                suitName: LocalizedStrings.karo.localized(languageManager.currentLanguage),
                                 color: .red,
                                 isSelected: hasDimondJack
                             ) {
@@ -93,7 +93,7 @@ struct ContentView: View {
                     
                     if hasCrossJack || hasPikJack || hasHeartJack || hasDimondJack {
                         VStack(spacing: 10) {
-                            Text("Ausgewählt: \(selectedJacksCount)")
+                            Text("\(LocalizedStrings.selected.localized(languageManager.currentLanguage)): \(selectedJacksCount)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(goldAccent)
                             
@@ -130,7 +130,7 @@ struct ContentView: View {
                         hasDiamondJack: hasDimondJack
                     )) {
                         HStack {
-                            Text("Reizwert berechnen")
+                            Text(LocalizedStrings.calculateReizwert.localized(languageManager.currentLanguage))
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                         }
                         .foregroundColor(pokerGreen)
@@ -151,7 +151,7 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .automatic) {
                     NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape.fill")
                             .foregroundColor(goldAccent)
@@ -159,13 +159,16 @@ struct ContentView: View {
                     }
                 }
             }
+            #if os(iOS)
             .toolbarBackground(.hidden, for: .navigationBar)
+            #endif
         }
     }
     
     private var selectedJacksCount: String {
         let count = [hasCrossJack, hasPikJack, hasHeartJack, hasDimondJack].filter { $0 }.count
-        return "\(count) \(count == 1 ? "Bube" : "Buben")"
+        let jackWord = count == 1 ? LocalizedStrings.jack.localized(languageManager.currentLanguage) : LocalizedStrings.jacks.localized(languageManager.currentLanguage)
+        return "\(count) \(jackWord)"
     }
     
     private func selectedBadge(suit: String, color: Color) -> some View {
@@ -183,6 +186,7 @@ struct JackCardView: View {
     let isSelected: Bool
     let action: () -> Void
     
+    @ObservedObject var languageManager = LanguageManager.shared
     private let goldAccent = Color(red: 0.85, green: 0.65, blue: 0.13)
     
     var body: some View {
@@ -192,7 +196,7 @@ struct JackCardView: View {
                     .font(.system(size: 50))
                     .foregroundColor(isSelected ? goldAccent : color)
                 
-                Text("B")
+                Text(LocalizedStrings.jackLetter.localized(languageManager.currentLanguage))
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(isSelected ? goldAccent : .black.opacity(0.8))
                 

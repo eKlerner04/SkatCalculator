@@ -23,9 +23,47 @@ struct SkatCalculatorView: View {
     @State private var schwarz = false
     @State private var schwarzAngesagt = false
     
+    @ObservedObject var languageManager = LanguageManager.shared
+    
+    private let pokerGreen = Color(red: 0.09, green: 0.35, blue: 0.25)
+    private let darkGreen = Color(red: 0.05, green: 0.25, blue: 0.18)
+    private let goldAccent = Color(red: 0.85, green: 0.65, blue: 0.13)
+    private let cardWhite = Color.white
+    
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 10) {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [darkGreen, pokerGreen]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    reizwertCard
+                    
+                    bubenAnzeige
+                    
+                    spielartSection
+                    
+                    zusatzansagenSection
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 20)
+            }
+        }
+        .navigationTitle(LocalizedStrings.reizwert.localized(languageManager.currentLanguage))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(darkGreen.opacity(0.95), for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        #endif
+    }
+    
+    
+    // MARK: - Berechnungslogik
                 
                 var mit: Int {
                     if hasCrossJack && hasPikJack && hasHeartJack && hasDiamondJack { return 4 }
@@ -102,117 +140,240 @@ struct SkatCalculatorView: View {
                     return 0
                 }
                 
-                let aktMit = SäsischeSpitze ? mitS : mit
-                let aktOhne = SäsischeSpitze ? ohneS : ohne
-                let aktText = aktMit > aktOhne ? "Mit \(aktMit)" : "Ohne \(aktOhne)"
-                
-                Text("Reizwert: \(Reizwert)")
-                    .font(.title2).bold()
+    var aktMit: Int { SäsischeSpitze ? mitS : mit }
+    var aktOhne: Int { SäsischeSpitze ? ohneS : ohne }
+    var aktText: String {
+        if aktMit > aktOhne {
+            return "\(LocalizedStrings.mit.localized(languageManager.currentLanguage)) \(aktMit)"
+        } else {
+            return "\(LocalizedStrings.ohne.localized(languageManager.currentLanguage)) \(aktOhne)"
+        }
+    }
+    
+    // MARK: - View Components
+    
+    var reizwertCard: some View {
+        VStack(spacing: 16) {
+            Text(Reizwert == 0 ? "—" : "\(Reizwert)")
+                .font(.system(size: 72, weight: .bold, design: .rounded))
+                .foregroundColor(goldAccent)
+            
+            Text(LocalizedStrings.reizwert.localized(languageManager.currentLanguage))
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundColor(cardWhite.opacity(0.8))
+            
+            if Reizwert > 0 {
+                Divider()
+                    .background(cardWhite.opacity(0.3))
+                    .padding(.horizontal, 40)
                 
                 if Nullspiel {
-                    Text("Nullspiel")
+                    Text(LocalizedStrings.nullspiel.localized(languageManager.currentLanguage))
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .foregroundColor(cardWhite)
                 } else {
-                    Text("\(aktText) • Spiel \(effektiverSpielwert)")
-                }
-                
-                HStack {
-                    if hasCrossJack{
-                        Image(systemName: "suit.club.fill")
-                    } else {
-                        Text("/")
-                    }
-                    if hasPikJack {
-                        Image(systemName: "suit.spade.fill")
-                    } else {
-                        Text("/")
-                    }
-                    
-                    if hasHeartJack{
-                        Image(systemName: "suit.heart.fill").foregroundColor(.red)
-                    } else {
-                        Text("/")
-                    }
-                    
-                    if hasDiamondJack{
-                        Image(systemName: "suit.diamond.fill").foregroundColor(.red)
-                    }else {
-                        Text("/")
-                    }
-                }
-                .font(.title)
-                
-                Group {
-                    Button { switchGame(.farbspiel) } label: { textButton("Farbspiel", active: Farbspiel) }
-                    if Farbspiel {
-                        HStack {
-                            suitButton("suit.club.fill", active: $FarbspielClub)
-                            suitButton("suit.spade.fill", active: $FarbspielSpade)
-                            suitButton("suit.heart.fill", active: $FarbspielHeart, color: .red)
-                            suitButton("suit.diamond.fill", active: $FarbspielDiamond, color: .red)
-                        }
-                    }
-                    
-                    Button {
-                        switchGame(.grand)
-                    } label: { textButton("Grand", active: Grand) }
-                    Button {
-                        switchGame(.nullspiel) } label:  { textButton("Nullspiel", active: Nullspiel) }
-                    Button { switchGame(.saechsisch) } label: { textButton("Sächsische Spitze", active: SäsischeSpitze) }
-                }
-                
-                // MARK: Zusatzansagen
-                VStack {
-                    HStack {
-                        toggleButton("Hand", flag: $hand, after: { if ouvert { hand = true } })
-                        toggleButton("Ouvert", flag: $ouvert, after: { if ouvert { hand = true } })
-                    }
-                    HStack {
-                        toggleButton("Schneider", flag: $schneider) {
-                            schneiderAngesagt = false; schwarz = false; schwarzAngesagt = false
-                        }
-                        toggleButton("Schneider anges.", flag: $schneiderAngesagt) {
-                            schneider = false; schwarz = false; schwarzAngesagt = false
-                        }
-                    }
-                    HStack {
-                        toggleButton("Schwarz", flag: $schwarz) {
-                            schneider = false; schneiderAngesagt = false; schwarzAngesagt = false
-                        }
-                        toggleButton("Schwarz anges.", flag: $schwarzAngesagt) {
-                            schwarz = false; schneider = false; schneiderAngesagt = false
+                    VStack(spacing: 6) {
+                        Text("\(aktText) • \(LocalizedStrings.spiel.localized(languageManager.currentLanguage)) \(effektiverSpielwert)")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(cardWhite)
+                        
+                        if let spielart = getCurrentSpielart() {
+                            Text(spielart)
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(cardWhite.opacity(0.7))
                         }
                     }
                 }
-                
             }
-            .navigationTitle("Reiz Calculator")
-            .padding()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 30)
+        .padding(.horizontal, 24)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(darkGreen.opacity(0.8))
+                .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 8)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(goldAccent.opacity(0.3), lineWidth: 1)
+        )
+    }
+    
+    var bubenAnzeige: some View {
+        HStack(spacing: 20) {
+            jackIcon("suit.club.fill", hasJack: hasCrossJack, color: .white)
+            jackIcon("suit.spade.fill", hasJack: hasPikJack, color: .white)
+            jackIcon("suit.heart.fill", hasJack: hasHeartJack, color: .red)
+            jackIcon("suit.diamond.fill", hasJack: hasDiamondJack, color: .red)
+        }
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(cardWhite.opacity(0.1))
+        )
+    }
+    
+    var spielartSection: some View {
+        VStack(spacing: 12) {
+            SectionHeader(title: LocalizedStrings.spielart.localized(languageManager.currentLanguage), icon: "suit.spade")
+            
+            VStack(spacing: 10) {
+                GameTypeButton(
+                    title: LocalizedStrings.farbspiel.localized(languageManager.currentLanguage),
+                    isSelected: Farbspiel,
+                    goldAccent: goldAccent
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        switchGame(.farbspiel)
+                    }
+                }
+                
+                    if Farbspiel {
+                    HStack(spacing: 12) {
+                        SuitSelectionButton(icon: "suit.club.fill", color: .white, isSelected: FarbspielClub, goldAccent: goldAccent) {
+                            selectFarbspiel(.club)
+                        }
+                        SuitSelectionButton(icon: "suit.spade.fill", color: .white, isSelected: FarbspielSpade, goldAccent: goldAccent) {
+                            selectFarbspiel(.spade)
+                        }
+                        SuitSelectionButton(icon: "suit.heart.fill", color: .red, isSelected: FarbspielHeart, goldAccent: goldAccent) {
+                            selectFarbspiel(.heart)
+                        }
+                        SuitSelectionButton(icon: "suit.diamond.fill", color: .red, isSelected: FarbspielDiamond, goldAccent: goldAccent) {
+                            selectFarbspiel(.diamond)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+                
+                GameTypeButton(
+                    title: LocalizedStrings.grand.localized(languageManager.currentLanguage),
+                    isSelected: Grand,
+                    goldAccent: goldAccent
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        switchGame(.grand)
+                    }
+                }
+                
+                GameTypeButton(
+                    title: LocalizedStrings.nullspiel.localized(languageManager.currentLanguage),
+                    isSelected: Nullspiel,
+                    goldAccent: goldAccent
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        switchGame(.nullspiel)
+                    }
+                }
+                
+                GameTypeButton(
+                    title: LocalizedStrings.saechsischeSpitze.localized(languageManager.currentLanguage),
+                    isSelected: SäsischeSpitze,
+                    goldAccent: goldAccent
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        switchGame(.saechsisch)
+                    }
+                }
+            }
         }
     }
     
-    
-    func textButton(_ label: String, active: Bool) -> some View {
-        Text(label)
-            .padding(6)
-            .overlay(active ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
-    }
-    
-    func suitButton(_ icon: String, active: Binding<Bool>, color: Color = .black) -> some View {
-        Button {
-            FarbspielClub = false; FarbspielSpade = false; FarbspielHeart = false; FarbspielDiamond = false
-            active.wrappedValue = true
-        } label: {
-            Image(systemName: icon)
-                .padding(6)
-                .foregroundStyle(color)
-                .overlay(active.wrappedValue ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
+    var zusatzansagenSection: some View {
+        VStack(spacing: 12) {
+            SectionHeader(title: LocalizedStrings.zusatzansagen.localized(languageManager.currentLanguage), icon: "star.fill")
+            
+            VStack(spacing: 10) {
+                HStack(spacing: 10) {
+                    ToggleChipButton(title: LocalizedStrings.hand.localized(languageManager.currentLanguage), isActive: hand, goldAccent: goldAccent) {
+                        withAnimation {
+                            hand.toggle()
+                            if ouvert { hand = true }
+                        }
+                    }
+                    ToggleChipButton(title: LocalizedStrings.ouvert.localized(languageManager.currentLanguage), isActive: ouvert, goldAccent: goldAccent) {
+                        withAnimation {
+                            ouvert.toggle()
+                            if ouvert { hand = true }
+                        }
+                    }
+                }
+                
+                HStack(spacing: 10) {
+                    ToggleChipButton(title: LocalizedStrings.schneider.localized(languageManager.currentLanguage), isActive: schneider, goldAccent: goldAccent) {
+                        withAnimation {
+                            schneider.toggle()
+                            if schneider {
+                                schneiderAngesagt = false
+                                schwarz = false
+                                schwarzAngesagt = false
+                            }
+                        }
+                    }
+                    ToggleChipButton(title: LocalizedStrings.schneiderAngesagt.localized(languageManager.currentLanguage), isActive: schneiderAngesagt, goldAccent: goldAccent) {
+                        withAnimation {
+                            schneiderAngesagt.toggle()
+                            if schneiderAngesagt {
+                                schneider = false
+                                schwarz = false
+                                schwarzAngesagt = false
+                            }
+                        }
+                    }
+                }
+                
+                HStack(spacing: 10) {
+                    ToggleChipButton(title: LocalizedStrings.schwarz.localized(languageManager.currentLanguage), isActive: schwarz, goldAccent: goldAccent) {
+                        withAnimation {
+                            schwarz.toggle()
+                            if schwarz {
+                                schneider = false
+                                schneiderAngesagt = false
+                                schwarzAngesagt = false
+                            }
+                        }
+                    }
+                    ToggleChipButton(title: LocalizedStrings.schwarzAngesagt.localized(languageManager.currentLanguage), isActive: schwarzAngesagt, goldAccent: goldAccent) {
+                        withAnimation {
+                            schwarzAngesagt.toggle()
+                            if schwarzAngesagt {
+                                schwarz = false
+                                schneider = false
+                                schneiderAngesagt = false
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+    
+    // MARK: - Helper Views
+    
+    func jackIcon(_ suit: String, hasJack: Bool, color: Color) -> some View {
+        VStack(spacing: 4) {
+            if hasJack {
+                Image(systemName: suit)
+                    .font(.system(size: 32))
+                    .foregroundColor(color)
+            } else {
+                Text("—")
+                    .font(.system(size: 32, weight: .light))
+                    .foregroundColor(cardWhite.opacity(0.3))
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Helper Functions
     
     enum GameOption { case farbspiel, grand, nullspiel, saechsisch }
+    enum Suit { case club, spade, heart, diamond }
     
     func switchGame(_ option: GameOption) {
-        // Reset alles
         Farbspiel = false; FarbspielClub = false; FarbspielSpade = false
         FarbspielHeart = false; FarbspielDiamond = false
         Grand = false; Nullspiel = false; SäsischeSpitze = false
@@ -224,18 +385,142 @@ struct SkatCalculatorView: View {
         case .saechsisch: SäsischeSpitze = true
         }
         
-        if option == .nullspiel { schneider = false; schneiderAngesagt = false; schwarz = false; schwarzAngesagt = false }
+        if option == .nullspiel {
+            schneider = false
+            schneiderAngesagt = false
+            schwarz = false
+            schwarzAngesagt = false
+        }
     }
     
-    func toggleButton(_ name: String, flag: Binding<Bool>, after: (() -> Void)? = nil) -> some View {
-        Button {
-            flag.wrappedValue.toggle()
-            after?()
-        } label: {
-            Text(name)
-                .padding(6)
-                .overlay(flag.wrappedValue ? RoundedRectangle(cornerRadius: 8).stroke(.green, lineWidth: 2) : nil)
+    func selectFarbspiel(_ suit: Suit) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            FarbspielClub = false
+            FarbspielSpade = false
+            FarbspielHeart = false
+            FarbspielDiamond = false
+            
+            switch suit {
+            case .club: FarbspielClub = true
+            case .spade: FarbspielSpade = true
+            case .heart: FarbspielHeart = true
+            case .diamond: FarbspielDiamond = true
+            }
         }
+    }
+    
+    func getCurrentSpielart() -> String? {
+        if FarbspielClub { return "\(LocalizedStrings.kreuz.localized(languageManager.currentLanguage)) (×12)" }
+        if FarbspielSpade { return "\(LocalizedStrings.pik.localized(languageManager.currentLanguage)) (×11)" }
+        if FarbspielHeart { return "\(LocalizedStrings.herz.localized(languageManager.currentLanguage)) (×10)" }
+        if FarbspielDiamond { return "\(LocalizedStrings.karo.localized(languageManager.currentLanguage)) (×9)" }
+        if Grand { return "\(LocalizedStrings.grand.localized(languageManager.currentLanguage)) (×24)" }
+        if SäsischeSpitze { return "\(LocalizedStrings.saechsischeSpitze.localized(languageManager.currentLanguage)) (×20)" }
+        return nil
+    }
+}
+
+// MARK: - Custom Components
+
+struct SectionHeader: View {
+    let title: String
+    let icon: String
+    private let goldAccent = Color(red: 0.85, green: 0.65, blue: 0.13)
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(goldAccent)
+            Text(title)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+            Spacer()
+        }
+        .padding(.bottom, 4)
+    }
+}
+
+struct GameTypeButton: View {
+    let title: String
+    let isSelected: Bool
+    let goldAccent: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundColor(isSelected ? Color(red: 0.05, green: 0.25, blue: 0.18) : .white)
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(Color(red: 0.05, green: 0.25, blue: 0.18))
+                }
+            }
+            .padding(.vertical, 14)
+            .padding(.horizontal, 18)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? goldAccent : Color.white.opacity(0.1))
+            )
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
+struct SuitSelectionButton: View {
+    let icon: String
+    let color: Color
+    let isSelected: Bool
+    let goldAccent: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 28))
+                .foregroundColor(isSelected ? Color(red: 0.05, green: 0.25, blue: 0.18) : color)
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? goldAccent : Color.white.opacity(0.15))
+                )
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
+struct ToggleChipButton: View {
+    let title: String
+    let isActive: Bool
+    let goldAccent: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundColor(isActive ? Color(red: 0.05, green: 0.25, blue: 0.18) : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isActive ? goldAccent : Color.white.opacity(0.1))
+                )
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 

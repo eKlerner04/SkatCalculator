@@ -1,0 +1,61 @@
+/* ContentView */
+"choose_your_jacks" = "Wähle deine Buben";
+"tap_cards" = "Tippe auf die Karten, die du hast";
+"selected" = "Ausgewählt";
+"jack" = "Bube";
+"jacks" = "Buben";
+"jack_letter" = "B";
+"calculate_reizwert" = "Reizwert berechnen";
+
+/* Card Names */
+"kreuz" = "Kreuz";
+"pik" = "Pik";
+"herz" = "Herz";
+"karo" = "Karo";
+
+/* SkatCalculatorView */
+"reizwert" = "Reizwert";
+"mit" = "Mit";
+"ohne" = "Ohne";
+"spiel" = "Spiel";
+
+/* Game Types */
+"farbspiel" = "Farbspiel";
+"grand" = "Grand";
+"nullspiel" = "Nullspiel";
+"saechsische_spitze" = "Sächsische Spitze";
+"spielart" = "Spielart";
+
+/* Additional Options */
+"zusatzansagen" = "Zusatzansagen";
+"hand" = "Hand";
+"ouvert" = "Ouvert";
+"schneider" = "Schneider";
+"schneider_angesagt" = "Schneider anges.";
+"schwarz" = "Schwarz";
+"schwarz_angesagt" = "Schwarz anges.";
+
+/* Settings */
+"settings" = "Einstellungen";
+"language" = "Sprache";
+"select_language" = "Wähle deine Sprache";
+"about" = "Über die App";
+"app_version" = "Version";
+"app_description" = "SkatCalculator hilft dir, den korrekten Reizwert beim Skat-Spiel zu berechnen. Wähle deine Buben, die Spielart und zusätzliche Ansagen aus.";
+"privacy_policy" = "Datenschutzerklärung";
+
+/* Privacy Policy */
+"last_updated" = "Zuletzt aktualisiert: November 2025";
+"privacy_intro_title" = "Einführung";
+"privacy_intro_text" = "Wir nehmen den Schutz deiner persönlichen Daten sehr ernst. Diese Datenschutzerklärung informiert dich darüber, wie SkatCalculator mit deinen Daten umgeht.";
+"data_collection_title" = "Datenerfassung";
+"data_collection_text" = "SkatCalculator erfasst keine persönlichen Daten. Die App funktioniert vollständig offline und sendet keinerlei Informationen an externe Server. Alle Berechnungen erfolgen lokal auf deinem Gerät.";
+"data_usage_title" = "Datennutzung";
+"data_usage_text" = "Die einzigen Daten, die gespeichert werden, sind deine App-Einstellungen (z.B. Sprachauswahl). Diese Informationen werden ausschließlich lokal in den UserDefaults deines Geräts gespeichert und niemals weitergegeben.";
+"data_storage_title" = "Datenspeicherung";
+"data_storage_text" = "Alle Daten werden ausschließlich auf deinem Gerät gespeichert. Es erfolgt keine Synchronisation mit Cloud-Diensten, es sei denn, du nutzt die Standard-iCloud-Backup-Funktion deines Geräts.";
+"user_rights_title" = "Deine Rechte";
+"user_rights_text" = "Du kannst jederzeit alle lokal gespeicherten Daten löschen, indem du die App deinstallierst. Da keine persönlichen Daten erfasst werden, gibt es keine weiteren Daten, auf die du zugreifen oder die du löschen müsstest.";
+"changes_title" = "Änderungen";
+"changes_text" = "Wir behalten uns das Recht vor, diese Datenschutzerklärung zu aktualisieren. Änderungen werden in der App bekannt gegeben und treten mit der Veröffentlichung einer neuen App-Version in Kraft.";
+
